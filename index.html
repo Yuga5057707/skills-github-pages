@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32 3 Phase Monitor</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    h1 { text-align: center; }
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 500px;
+    }
+    .phase {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>ESP32 3-Фазний Монітор</h1>
+  <div class="card" id="data">Завантаження...</div>
+
+  <script>
+    // 🔧 Заміни нижче значення своїми з Firebase налаштувань
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "your-project-id.firebaseapp.com",
+      databaseURL: "https://your-project-id.firebaseio.com",
+      projectId: "your-project-id"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function updateDisplay(snapshot) {
+      const container = document.getElementById("data");
+      container.innerHTML = "";
+
+      snapshot.forEach((child) => {
+        const phase = child.key;
+        const data = child.val();
+        container.innerHTML += `
+          <div class="phase"><strong>${phase.toUpperCase()}</strong><br>
+            Струм: ${data.current.toFixed(2)} A<br>
+            Напруга: ${data.voltage.toFixed(2)} V
+          </div>
+          <hr>
+        `;
+      });
+    }
+
+    db.ref("/").on("value", updateDisplay);
+  </script>
+</body>
+</html>
